@@ -8,4 +8,7 @@ setup(name='kubipy',
       author_email='ljstroemsdoerfer@gmail.com',
       license='MIT',
       packages=['kubipy'],
+      install_requires=[
+          'requests'
+      ],
       zip_safe=False)
