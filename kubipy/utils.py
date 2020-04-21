@@ -1,4 +1,5 @@
 # import libs
+import subprocess
 import os
 from requests import get
 from sys import platform
@@ -7,7 +8,7 @@ from sys import platform
 class minipy:
 
     # describe class
-    def __init__(self):
+    def __init__(self, sudo_password):
         
         # define the slots
         self.description = 'local kubernetes cluster'
@@ -15,6 +16,7 @@ class minipy:
         self.OS = platform
         self.wd = os.getcwd()
         self.status = None
+        self.sudo_password = sudo_password
 
     # define private method to download file
     def __download_driver(self, url, file_name):
@@ -64,23 +66,26 @@ class minipy:
     # function to install driver
     def __install_driver(self, file_name):
 
+        # extract sudo password
+        sudo_password = self.sudo_password
+
         # try to install driver
         try: 
 
             # mount the dmg
-            command = str('hdiutil attach ' + file_name)
-            os.system(command)
+            command = str('hdiutil attach ' + file_name + ' 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # change to mounted volume
             os.chdir('/Volumes/VirtualBox')
 
             # install the .pkg file
-            command = str('sudo installer -pkg VirtualBox.pkg -target "/"')
-            os.system(command)
+            command = str('echo ' + sudo_password + '| sudo -S installer -pkg VirtualBox.pkg -target "/" 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # unmount and eject the dmg
-            command = str('hdiutil detach -force /Volumes/VirtualBox/')
-            os.system(command)
+            command = str('hdiutil detach -force /Volumes/VirtualBox/ 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # change to previous wd
             os.chdir(self.wd)
@@ -88,7 +93,7 @@ class minipy:
             # remove tmp dir
             tmp_dir_name = file_name.split('/')[0]
             command = str('rm -rf ' + tmp_dir_name)
-            os.system(command)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
             return True
@@ -106,8 +111,8 @@ class minipy:
         try:
 
             # install kubectl
-            command = 'brew install kubectl'
-            os.system(command)
+            command = 'brew install kubectl 2>&1'
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
             return True
@@ -125,8 +130,8 @@ class minipy:
         try:
 
             # install minikube
-            command = 'brew install minikube'
-            os.system(command)
+            command = 'brew install minikube 2>&1'
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return 
             return True
@@ -237,8 +242,8 @@ class minipy:
         try:
 
             # start minikube
-            command = str('minikube start --vm-driver=virtualbox --cpus=' + cpus + ' --memory=' + memory)
-            os.system(command)
+            command = str('minikube start --vm-driver=virtualbox --cpus=' + cpus + ' --memory=' + memory + ' 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status
             self.status = 'running'
@@ -260,7 +265,7 @@ class minipy:
 
             # stop minikube
             command = str('minikube stop')
-            os.system(command)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status
             self.status = 'stopped'
@@ -282,25 +287,27 @@ class minipy:
 
             # stop minikube
             command = str('minikube stop')
-            os.system(command)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # delete minikube
             command = str('minikube delete')
-            os.system(command)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # delete all remittant files
-            command = str('rm -rf ~/.kube ~/.minikube')
-            os.system(command)
-            command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube')
-            os.system(command)
-            command = str("launchctl stop '*kubelet*.mount'")
-            os.system(command)
-            command = str('launchctl stop localkube.service')
-            os.system(command)
-            command = str('rm -rf /etc/kubernetes/')
-            os.system(command)
-            command = str('rm -rf /usr/local/Cellar/minikube')
-            os.system(command)
+            command = str('rm -rf ~/.kube ~/.minikube 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('rm -rf /usr/local/bin/kubectl 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str("launchctl stop '*kubelet*.mount' 2>&1")
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('launchctl stop localkube.service 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('rm -rf /etc/kubernetes/ 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('rm -rf /usr/local/Cellar/minikube 2>&1')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status
             self.status = 'deleted'
