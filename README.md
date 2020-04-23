@@ -4,7 +4,7 @@ KubiPy helps you to manage your local Kubernetes Cluster fully from Python. It p
 
 ## Usage
 
-KubiPy provides a standard Python interface to the setup process of your local Kubernetes cluster. KubiPy provides the <code>minipy()<code> class. Once initiated this class is the core of all your operations.
+KubiPy provides a standard Python interface to the setup process of your local Kubernetes cluster. KubiPy provides the <code>minipy()</code> class. Once initiated this class is the core of all your operations.
 
     # initiate the class 
     cluster = minipy()
