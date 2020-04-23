@@ -8,7 +8,7 @@ from sys import platform
 class minipy:
 
     # describe class
-    def __init__(self):
+    def __init__(self, greeting = True):
         
         # define the slots
         self.description = 'local kubernetes cluster'
@@ -16,6 +16,42 @@ class minipy:
         self.OS = platform
         self.wd = os.getcwd()
         self.status = None
+
+        # welcome message
+        welcome_message = """
+
+                                Welcome to 
+
+                ██╗  ██╗██╗   ██╗██████╗ ██╗██████╗ ██╗   ██╗
+                ██║ ██╔╝██║   ██║██╔══██╗██║██╔══██╗╚██╗ ██╔╝
+                █████╔╝ ██║   ██║██████╔╝██║██████╔╝ ╚████╔╝ 
+                ██╔═██╗ ██║   ██║██╔══██╗██║██╔═══╝   ╚██╔╝  
+                ██║  ██╗╚██████╔╝██████╔╝██║██║        ██║   
+                ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝        ╚═╝   
+                                                                
+
+        KubiPy helps you to setup and work with Minikube from your Python 
+        interface. Especially for testing purposes and exploration this is
+        extremely helpful. With a few Python commands you have a running
+        local Kubernetes cluster and can deploy APIs.
+
+        KubiPy helps you to start your very own local Kubernetes cluster. This
+        is done using Minikube. The driver we use is VirtualBox. We also install
+        kubectl as a command line tool. So if you are getting bored with Python
+        you can interact with your Minikube cluster from the command line.
+
+        If you have any questions, please get in contact on GitHub, there you
+        can also find all the code: https://github.com/LJStroemsdoerfer/kubipy
+
+        Thank you for using KubiPy and have fun with it!
+    
+        """
+
+        # check if greeting
+        if greeting:
+
+            # print welcome message
+            print(welcome_message)
 
     # define private method to download file
     def __download_driver(self, url, file_name):
@@ -53,6 +89,9 @@ class minipy:
             # save dir_name
             dir_name = 'tmp_dir'
 
+            # create utils dir
+            os.mkdir('/usr/local/Cellar/kubipy_utils')
+
             # return dir_name
             return dir_name
 
@@ -74,6 +113,10 @@ class minipy:
 
             # change to mounted volume
             os.chdir('/Volumes/VirtualBox')
+
+            # copy the uninstaller script
+            command = str('cp VirtualBox_Uninstall.tool /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+            subprocess.call(command.split())
 
             # install the .pkg file
             command = str('sudo installer -pkg VirtualBox.pkg -target /')
@@ -324,6 +367,14 @@ class minipy:
             command = str('rm -rf /usr/local/Cellar/minikube')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
             command = str('rm -rf /usr/local/Cellar/kubernetes-cli')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # uninstall VirtualBox
+            command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # delete utils folder
+            command = str('rm -rf /usr/local/Cellar/kubipy_utils')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status

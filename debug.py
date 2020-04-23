@@ -10,18 +10,22 @@ file_name = "tmp_dir/virtualbox_install_pkg.dmg"
 wd = os.getcwd()
 
 os.mkdir('tmp_dir')
+os.mkdir('/usr/local/Cellar/kubipy_utils')
 
 with open(file_name, 'wb') as file:
     response = get(url)
     file.write(response.content)
 
 command = str('hdiutil attach ' + file_name)
-subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+subprocess.call(command.split())
 
 os.chdir('/Volumes/VirtualBox')
 
+command = str('cp VirtualBox_Uninstall.tool /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+subprocess.call(command.split())
+
 command = str('sudo installer -pkg VirtualBox.pkg -target /')
-subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+subprocess.call(command.split())
 
 command = str('hdiutil detach -force /Volumes/VirtualBox/')
 subprocess.call(command.split())
@@ -61,3 +65,9 @@ command = str('rm -rf /usr/local/Cellar/minikube')
 subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 command = str('rm -rf /usr/local/Cellar/kubernetes-cli')
 subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+subprocess.call(command.split())
+
+command = str('rm -rf /usr/local/Cellar/kubipy_utils')
+subprocess.call(command.split())
