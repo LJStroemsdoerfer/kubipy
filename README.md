@@ -51,4 +51,3 @@ At the moment KubiPy provides the necessary functionalities to setup, start and 
     <li><code>dashboard()</code></li>
     <li><code>delete()</code></li>
 </ul>
-
