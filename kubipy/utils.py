@@ -183,6 +183,9 @@ class minipy:
             # raise error
             raise Exception('I could not download VirtualBox!')
 
+        # print attention warning for password
+        print('ATTENTION: you will be asked to provide your sudo password in just a second')
+
         # install virtualbox driver
         installed_vb = self.__install_driver(file_name)
 
@@ -252,6 +255,22 @@ class minipy:
 
             # raise error
             raise Exception('Starting Minikube failed')
+
+    # function to start minikube dashboard
+    def dashboard(self):
+
+        # try to start minikube dashboard
+        try:
+
+            # start dashboard
+            command = str('minikube dashboard')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+        # return error if it doesn't work
+        except:
+
+            # raise error
+            raise Exception('Minikube dashboard failed')
 
     # function to stop minikube
     def stop(self):
