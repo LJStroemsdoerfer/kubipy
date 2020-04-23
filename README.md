@@ -36,13 +36,7 @@ Minikube depends on numerous components to run. The provision and configuration 
 
 ## Stage of Development
 
-### Operating System
-
-KubiPy is under active development and <b>supports</b> currently only <b>macOS Catalina</b>. The next step is to include <b>Ubuntu</b>. 
-
-### Current Functionalities
-
-At the moment KubiPy provides the necessary functionalities to setup, start and shut down Minikube on your local machine. The functions include:
+KubiPy is under active development and <b>supports</b> currently only <b>macOS</b>. At the moment KubiPy provides the necessary functionalities to setup, start and shut down Minikube on your local machine. The functions include:
 
 <ul>
     <li><code>install()</code></li>
@@ -50,4 +44,25 @@ At the moment KubiPy provides the necessary functionalities to setup, start and 
     <li><code>stop()</code></li>
     <li><code>dashboard()</code></li>
     <li><code>delete()</code></li>
+</ul>
+
+## Next Steps
+
+### Version 0.2
+<ul>
+    <li>Extend to Ubuntu 19.10 & 18.04</li>
+    <li>Extend to CentOS 7 & 8</li>
+</ul>
+
+### Version 0.3
+<ul>
+    <li>Kubectl config management</li>
+    <li>Minikube project creation<li>
+    <li>Minikube project management</li>
+    <li>Docker container creation</li>
+</ul>
+
+### Version 1.0
+<ul>
+    <li>API deployment to minikube</li>
 </ul>
