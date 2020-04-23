@@ -8,7 +8,7 @@ from sys import platform
 class minipy:
 
     # describe class
-    def __init__(self, sudo_password):
+    def __init__(self):
         
         # define the slots
         self.description = 'local kubernetes cluster'
@@ -16,7 +16,6 @@ class minipy:
         self.OS = platform
         self.wd = os.getcwd()
         self.status = None
-        self.sudo_password = sudo_password
 
     # define private method to download file
     def __download_driver(self, url, file_name):
@@ -66,25 +65,22 @@ class minipy:
     # function to install driver
     def __install_driver(self, file_name):
 
-        # extract sudo password
-        sudo_password = self.sudo_password
-
         # try to install driver
         try: 
 
             # mount the dmg
-            command = str('hdiutil attach ' + file_name + ' 2>&1')
+            command = str('hdiutil attach ' + file_name)
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # change to mounted volume
             os.chdir('/Volumes/VirtualBox')
 
             # install the .pkg file
-            command = str('echo ' + sudo_password + '| sudo -S installer -pkg VirtualBox.pkg -target "/" 2>&1')
+            command = str('sudo installer -pkg VirtualBox.pkg -target /')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # unmount and eject the dmg
-            command = str('hdiutil detach -force /Volumes/VirtualBox/ 2>&1')
+            command = str('hdiutil detach -force /Volumes/VirtualBox/')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # change to previous wd
@@ -130,7 +126,7 @@ class minipy:
         try:
 
             # install minikube
-            command = 'brew install minikube 2>&1'
+            command = 'brew install minikube'
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return 
@@ -242,7 +238,7 @@ class minipy:
         try:
 
             # start minikube
-            command = str('minikube start --vm-driver=virtualbox --cpus=' + cpus + ' --memory=' + memory + ' 2>&1')
+            command = str('minikube start --vm-driver=virtualbox --cpus=' + cpus + ' --memory=' + memory)
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status
@@ -294,19 +290,21 @@ class minipy:
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # delete all remittant files
-            command = str('rm -rf ~/.kube ~/.minikube 2>&1')
+            command = str('rm -rf ~/.kube ~/.minikube')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube 2>&1')
+            command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/bin/kubectl 2>&1')
+            command = str('rm -rf /usr/local/bin/kubectl')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str("launchctl stop '*kubelet*.mount' 2>&1")
+            command = str("launchctl stop '*kubelet*.mount'")
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('launchctl stop localkube.service 2>&1')
+            command = str('launchctl stop localkube.service')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /etc/kubernetes/ 2>&1')
+            command = str('rm -rf /etc/kubernetes/')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/Cellar/minikube 2>&1')
+            command = str('rm -rf /usr/local/Cellar/minikube')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('rm -rf /usr/local/Cellar/kubernetes-cli')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # update status
