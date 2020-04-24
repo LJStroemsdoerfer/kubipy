@@ -12,7 +12,7 @@ current_version = kubipy.__version__
 # define the setup
 setup(name='kubipy',
       version=current_version,
-      description='a simply library to orchestrate local kubernetes clusters from python',
+      description='Python interface for Minikube',
       long_description=long_description,
       long_description_content_type='text/markdown',
       url='https://github.com/LJStroemsdoerfer/kubipy',
