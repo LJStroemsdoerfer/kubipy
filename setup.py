@@ -11,7 +11,7 @@ current_version = kubipy.__version__
 
 # define the setup
 setup(name='kubipy',
-      version='0.1',
+      version=current_version,
       description='a simply library to orchestrate local kubernetes clusters from python',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -21,7 +21,6 @@ setup(name='kubipy',
       license='MIT',
       packages=['kubipy'],
       install_requires=[
-          'requests',
-          'subprocess'
+          'requests'
       ],
       zip_safe=False)

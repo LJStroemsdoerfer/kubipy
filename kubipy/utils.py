@@ -15,7 +15,7 @@ class minipy:
         self.url_mac = 'https://download.virtualbox.org/virtualbox/6.1.6/VirtualBox-6.1.6-137129-OSX.dmg'
         self.OS = platform
         self.wd = os.getcwd()
-        self.status = None
+        self.status = 'initialized'
 
         # welcome message
         welcome_message = """
@@ -371,7 +371,7 @@ class minipy:
 
             # uninstall VirtualBox
             command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            subprocess.call(command.split())
 
             # delete utils folder
             command = str('rm -rf /usr/local/Cellar/kubipy_utils')
