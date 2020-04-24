@@ -6,6 +6,9 @@ __pycache__/
 # test folder
 test/
 
+# deployment script
+deploy.sh
+
 # Mac Files
 .DS_Store
 
