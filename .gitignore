@@ -3,11 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# test folder
-test/
+# deployment folder
+deployment/
 
-# deployment script
-deploy.sh
+# vs code files
+.vscode/
 
 # Mac Files
 .DS_Store
