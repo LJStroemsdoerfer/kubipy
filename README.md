@@ -1,4 +1,4 @@
-# KubiPy - Orchestrate Kubernetes from Python
+# KubiPy - Orchestrate Kubernetes from Python <img src="docs/kubipy_sticker.png" width=170 align="right" />
 
 KubiPy helps you to manage your local Kubernetes Cluster fully from Python. It provides an interface to Minikube and allows you to setup and manage a cluster without leaving Python. This is immensively helpful to enable local testing. You can install the library via pip: <code>pip install kubipy</code>.
 
