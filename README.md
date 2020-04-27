@@ -3,6 +3,8 @@
 [![Version](https://img.shields.io/pypi/v/kubipy.svg)](https://pypi.org/project/kubipy/)
 [![License](https://img.shields.io/pypi/l/kubipy.svg)](https://raw.githubusercontent.com/LJstroemsdoerfer/kubipy/master/LICENSE)
 [![Status](https://img.shields.io/badge/status-stable-green.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
+[![macOS](https://img.shields.io/badge/macOS-stable-green.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
+[![Ubuntu 18.04](https://img.shields.io/badge/Ubuntu%2018.04-in%20progress-grey.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
 
 KubiPy helps you to manage your local Kubernetes Cluster fully from Python. It provides an interface to Minikube and allows you to setup and manage a cluster without leaving Python. This is immensively helpful to enable local testing. You can install the library via pip: <code>pip install kubipy</code>.
 
