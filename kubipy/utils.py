@@ -56,6 +56,27 @@ class minipy:
     # define private method to download file
     def __download_driver(self, url, file_name):
 
+        """
+        Private Method to download VirtualBox driver.
+
+        This function downloads the binaries for the VirtualBox driver from
+        https://download.virtualbox.org. Given the multi platform support I 
+        chose VirtualBox as the Hypervisor.
+
+        Parameters
+        ----------
+        url : str
+            Download URL for virtualbox
+        file_name : str
+            File name with path for the binary
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+
         # try to download driver
         try:
 
@@ -80,6 +101,20 @@ class minipy:
     # define private method to create a temporary directory
     def __create_temp_dir(self):
 
+        """
+        Private Method to create necessary temp dirs.
+
+        This function creates a temporary directory in the project directory. 
+        This directory is used to install the hypervisor. It also creates a 
+        temporary in /usr/local/Cellar. This stores uninstallation tools.
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+
         # try to create tmp dirctory in cwd
         try:
 
@@ -103,6 +138,25 @@ class minipy:
 
     # function to install driver
     def __install_driver(self, file_name):
+
+        """
+        Private Method to install VirtualBox driver.
+
+        This function mounts the binary and then installs the hypervisor from
+        scratch. The VirtualBox uninstall script is copied and written to the 
+        /usr/local/Cellar/kubipy_utils directory
+
+        Parameters
+        ----------
+        file_name : str
+            File name with path for the binary
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
 
         # try to install driver
         try: 
@@ -146,6 +200,19 @@ class minipy:
     # function to install kubectl
     def __install_kubectl(self):
 
+        """
+        Private Method to install kubernetes-cli.
+
+        This function downloads and installs kubectl as a kubernetes cli. The 
+        cli is installed using the macOS package manager Homebrew.
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+
         # try to install kubectl
         try:
 
@@ -165,6 +232,19 @@ class minipy:
     # function to install minikube
     def __install_minikube(self):
 
+        """
+        Private Method to install minikube.
+
+        This function downloads and installs minikube as a local kubernetes
+        cluster. Minikube is installed using the macOS package manager Homebrew.
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+
         # try to install minikube
         try:
 
@@ -183,6 +263,14 @@ class minipy:
 
     # function to install minikube
     def install(self):
+
+        """
+        Main method to install Minikube with all dependencies.
+
+        This function calls the previous private functions one after another to
+        download and install all necessary components to setup Minikube.
+
+        """
 
         # check if platform is macOS
         if platform == 'darwin':
@@ -280,6 +368,26 @@ class minipy:
     # function to start minikube
     def start(self, cpus = '2', memory = '2G'):
 
+        """
+        Main method to start the Minikube cluster.
+
+        This function is a python wrapper around the 'minikube start' shell 
+        command. The cluster is sporned and set to run.
+
+        Parameters
+        ----------
+        cpus : str
+            String to indicate the number of cores used for the cluster
+        memory: str
+            String to indicate the amount of memory allocated to the cluster
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+
         # try to start minikube
         try:
 
@@ -302,6 +410,15 @@ class minipy:
     # function to start minikube dashboard
     def dashboard(self):
 
+        """
+        Main method to run the Minikube dashboard.
+
+        This function calls the standard Minikube dashboard. Once called, the 
+        dashboard is opened in the browser. The python console is then a trace
+        log.
+
+        """
+
         # try to start minikube dashboard
         try:
 
@@ -317,6 +434,19 @@ class minipy:
 
     # function to stop minikube
     def stop(self):
+
+        """
+        Main method to stop the Minikube cluster.
+
+        This function stops and shuts down the Minikube cluster. The function
+        is a wrapper around the 'minikube stop' shell command.
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
         
         # try to stop minikube
         try:
@@ -338,7 +468,22 @@ class minipy:
             raise Exception('I could not stop minikube')
 
     # function to delete minikube
-    def delete(self):
+    def delete(self, cli = True, driver = True):
+
+        """
+        Main method to delete Minikube and all dependencies.
+
+        This function deletes Minikube together with all dependencies. The user
+        has to decide which components to keep and which ones to delete.
+
+        Parameters
+        ----------
+        cli : boolean
+            Boolean indicating whether the cli should also be deleted
+        driver : boolean
+            Boolean indicating whether the driver should also be deleted
+            
+        """
 
         # try to delete minikube
         try:
@@ -351,31 +496,55 @@ class minipy:
             command = str('minikube delete')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
-            # delete all remittant files
-            command = str('rm -rf ~/.kube ~/.minikube')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/bin/kubectl')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str("launchctl stop '*kubelet*.mount'")
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('launchctl stop localkube.service')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /etc/kubernetes/')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/Cellar/minikube')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            command = str('rm -rf /usr/local/Cellar/kubernetes-cli')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            # check if cli should also be deleted
+            if cli:
+                
+                # delete all remittant files
+                command = str('rm -rf ~/.kube ~/.minikube')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('rm -rf /usr/local/bin/localkube /usr/local/bin/minikube')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('rm -rf /usr/local/bin/kubectl')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str("launchctl stop '*kubelet*.mount'")
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('launchctl stop localkube.service')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('rm -rf /etc/kubernetes/')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('rm -rf /usr/local/Cellar/minikube')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                command = str('rm -rf /usr/local/Cellar/kubernetes-cli')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
-            # uninstall VirtualBox
-            command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
-            subprocess.call(command.split())
+                # print message
+                print ('cli successfully removed')
 
-            # delete utils folder
-            command = str('rm -rf /usr/local/Cellar/kubipy_utils')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            # else
+            else:
+
+                # print message
+                print ('cli kept alive on your machine')
+
+            # check if driver should be deleted
+            if driver:
+
+                # uninstall VirtualBox
+                command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+                subprocess.call(command.split())
+
+                # delete utils folder
+                command = str('rm -rf /usr/local/Cellar/kubipy_utils')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+                # print message
+                print ('driver successfully deleted')
+            
+            # else
+            else:
+
+                # print message
+                print ('driver kept alive on your machine')
 
             # update status
             self.status = 'deleted'
