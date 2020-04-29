@@ -1,3 +1,21 @@
+"""
+utils.py contains the base class minipy(), which provides the core functions to
+setup and manage minikube clusters.
+
+Slots:
+--------
+description: str
+    Gives a little description
+url_mac: str
+    Download URL for the VirtualBox driver
+OS: str
+    Stores the platform the user is running on
+wd: str
+    Stores the current working directory
+status: str
+    Stores the current status of the minikube cluster
+"""
+
 # import libs
 import subprocess
 import os
