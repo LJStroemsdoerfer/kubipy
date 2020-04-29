@@ -70,6 +70,58 @@ class minipy:
 
             # print welcome message
             print(welcome_message)
+    
+    # define pivate method to check if components already exists
+    def __check_installed(self):
+
+
+        # check if virtualbox is installed
+        try: 
+
+            # check if cli is recognized
+            command = ('virtualbox --help')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # installed if not crashed
+            vb_installed = True
+        
+        # handle exception
+        except:
+
+            # not installed
+            vb_installed = False
+        
+        # check if kubectl is already installed
+        try:
+
+            # check if cli is recognized
+            command = ('kubectl config view')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # installed if not crashed
+            kc_installed = True
+        
+        # handle exception
+        except:
+
+            # not installed
+            kc_installed = False
+
+        # check if minikube is installed
+        try: 
+
+            # check if cli is recognized
+            command = ('minikube version')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # installed if not crashed
+            mk_installed = True
+        
+        # handle exception
+        except:
+
+            # not installed
+            mk_installed = False
 
     # define private method to download file
     def __download_driver(self, url, file_name):
