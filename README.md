@@ -1,4 +1,4 @@
-# KubiPy - Manage Minikube for macOS <img src="docs/kubipy_sticker.png" width=170 align="right" />
+# KubiPy - macOS Python manager for Minikube <img src="docs/kubipy_sticker.png" width=170 align="right" />
 
 [![Version](https://img.shields.io/pypi/v/kubipy.svg)](https://pypi.org/project/kubipy/)
 [![License](https://img.shields.io/pypi/l/kubipy.svg)](https://raw.githubusercontent.com/LJstroemsdoerfer/kubipy/master/LICENSE)
@@ -61,19 +61,22 @@ KubiPy is under active development and <b>supports</b> currently only <b>macOS</
 
 ### Version 0.2
 <ul>
-    <li>Extend to Ubuntu 19.10 & 18.04</li>
-    <li>Extend to CentOS 7 & 8</li>
+    <li>Minikube project creation</li>
+    <li>Minikube project management</li>
 </ul>
 
 ### Version 0.3
 <ul>
-    <li>Kubectl config management</li>
-    <li>Minikube project creation</li>
-    <li>Minikube project management</li>
-    <li>Docker container creation</li>
+    <li>Docker component</li>
+    <li>Docker config management</li>
 </ul>
 
 ### Version 1.0
 <ul>
     <li>API deployment to minikube</li>
+</ul>
+
+### Version 2.0
+<ul>
+    <li>Linux Support: CentOS, Ubuntu, Debian</li>
 </ul>
