@@ -652,7 +652,7 @@ class minipy:
                 subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
                 # print message
-                print ('driver successfully deleted')
+                print ('driver successfully removed')
             
             # else
             else:
