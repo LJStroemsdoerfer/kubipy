@@ -12,7 +12,7 @@ OS: str
     Stores the platform the user is running on
 wd: str
     Stores the current working directory
-__status: str
+current_status: str
     Stores the current status of the minikube cluster
 vb_installed: boolean
     Stores if VirtualBox is already installed
@@ -39,7 +39,7 @@ class minipy:
         self.url_mac = 'https://download.virtualbox.org/virtualbox/6.1.6/VirtualBox-6.1.6-137129-OSX.dmg'
         self.OS = platform
         self.wd = os.getcwd()
-        self.__status = 'initialized'
+        self.current_status = 'initialized'
         self.vb_installed = None
         self.kc_installed = None
         self.mk_installed = None
@@ -476,11 +476,11 @@ class minipy:
                 # raise error
                 raise Exception('I could not install minikube')
 
-        # update __status
-        self.__status = 'installed'
+        # update current_status
+        self.current_status = 'installed'
     
     # function to start minikube
-    def start(self, cpus = '2', memory = '2G', trace = False):
+    def start(self, cpus = '2', memory = '2G', log_trace = False):
 
         """
         Main method to start the Minikube cluster.
@@ -520,14 +520,14 @@ class minipy:
                 # run command without trace
                 subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
-            # update __status
-            self.__status = 'running'
+            # update current_status
+            self.current_status = 'running'
 
         # return error if it doesn't work
         except:
 
-            # update __status
-            self.__status = 'crashed'
+            # update current_status
+            self.current_status = 'crashed'
 
             # raise error
             raise Exception('Starting Minikube failed')
@@ -539,7 +539,7 @@ class minipy:
         Main method to check the status of the cluster.
 
         This function calls the standard minikube status check. Unlike the 
-        self.__status, this function shows the system output.
+        self.current_status, this function shows the system output.
 
         """
 
@@ -604,14 +604,14 @@ class minipy:
             command = str('minikube stop')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
-            # update __status
-            self.__status = 'stopped'
+            # update current_status
+            self.current_status = 'stopped'
 
         # return error if it doesn't work
         except:
 
-            # update __status
-            self.__status = 'not responding'
+            # update current_status
+            self.current_status = 'not responding'
 
             # raise error
             raise Exception('I could not stop minikube')
@@ -682,8 +682,8 @@ class minipy:
                 try:
 
                     # uninstall VirtualBox
-                    command = str('bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
-                    subprocess.call(command.split())
+                    command = str('echo Yes | bash /usr/local/Cellar/kubipy_utils/VirtualBox_Uninstall.tool')
+                    subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
                     # delete utils folder
                     command = str('rm -rf /usr/local/Cellar/kubipy_utils')
@@ -704,14 +704,14 @@ class minipy:
                 # print message
                 print ('driver kept alive on your machine')
 
-            # update __status
-            self.__status = 'deleted'
+            # update current_status
+            self.current_status = 'deleted'
 
         # raise error if it didn't work
         except:
 
-            # update __status
-            self.__status  = 'not responding'
+            # update current_status
+            self.current_status  = 'not responding'
 
             # raise error
             raise Exception('I could not delete minikube entirely')

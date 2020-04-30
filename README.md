@@ -54,6 +54,7 @@ KubiPy is under active development and <b>supports</b> currently only <b>macOS</
     <li><code>start()</code></li>
     <li><code>stop()</code></li>
     <li><code>dashboard()</code></li>
+    <li><code>status()</code></li>
     <li><code>delete()</code></li>
 </ul>
 
