@@ -14,6 +14,12 @@ wd: str
     Stores the current working directory
 status: str
     Stores the current status of the minikube cluster
+vb_installed: boolean
+    Stores if VirtualBox is already installed
+kc_installed: boolean
+    Stores if kubectl is already installed
+mk_installed: boolean
+    Stores if minikube is already installed
 """
 
 # import libs
@@ -34,6 +40,9 @@ class minipy:
         self.OS = platform
         self.wd = os.getcwd()
         self.status = 'initialized'
+        self.vb_installed = None
+        self.kc_installed = None
+        self.mk_installed = None
 
         # welcome message
         welcome_message = """
@@ -122,6 +131,11 @@ class minipy:
 
             # not installed
             mk_installed = False
+
+        # store info in object
+        self.vb_installed = vb_installed
+        self.kc_installed = kc_installed
+        self.mk_installed = mk_installed
 
     # define private method to download file
     def __download_driver(self, url, file_name):
@@ -287,7 +301,7 @@ class minipy:
         try:
 
             # install kubectl
-            command = 'brew install kubectl 2>&1'
+            command = 'brew install kubectl'
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
@@ -342,95 +356,122 @@ class minipy:
 
         """
 
-        # check if platform is macOS
-        if platform == 'darwin':
-
-            # set the binary download to the macOS file
-            url = self.url_mac
-
-            # define file ending
-            ending = '.dmg'
-
-        # else
-        else:
-
-            # exit function
-            raise Exception('Currently only MacOS is supported')
-
-        # create a new directory
-        tmp_dir_name = self.__create_temp_dir()
-
-        # check if succesfull
-        if tmp_dir_name == None:
-
-            # raise error
-            raise Exception('I could not create a tmp dir. Check your python session permissions!')
-
-        # set filename
-        file_name = str(tmp_dir_name + '/' + 'virtualbox_install_pkg' + ending)
-
-        # download virtualbox driver
-        downloaded_vb = self.__download_driver(url, file_name)
-
-        # check if it worked
-        if downloaded_vb:
+        # test if VirtualBox needs to be installed
+        if self.vb_installed:
 
             # print message
-            print ('Successfully downloaded VirtualBox Driver')
+            print ('VirtualBox is already installed')
 
-        # break the function if it didn't work
+        # if it is not installed
         else:
+            
+            # check if platform is macOS
+            if platform == 'darwin':
 
-            # raise error
-            raise Exception('I could not download VirtualBox!')
+                # set the binary download to the macOS file
+                url = self.url_mac
 
-        # print attention warning for password
-        print('ATTENTION: you will be asked to provide your sudo password in just a second')
+                # define file ending
+                ending = '.dmg'
 
-        # install virtualbox driver
-        installed_vb = self.__install_driver(file_name)
+            # else
+            else:
 
-        # check if it worked
-        if installed_vb:
+                # exit function
+                raise Exception('Currently only MacOS is supported')
+
+            # create a new directory
+            tmp_dir_name = self.__create_temp_dir()
+
+            # check if succesfull
+            if tmp_dir_name == None:
+
+                # raise error
+                raise Exception('I could not create a tmp dir. Check your python session permissions!')
+
+            # set filename
+            file_name = str(tmp_dir_name + '/' + 'virtualbox_install_pkg' + ending)
+
+            # download virtualbox driver
+            downloaded_vb = self.__download_driver(url, file_name)
+
+            # check if it worked
+            if downloaded_vb:
+
+                # print message
+                print ('Successfully downloaded VirtualBox Driver')
+
+            # break the function if it didn't work
+            else:
+
+                # raise error
+                raise Exception('I could not download VirtualBox!')
+
+            # print attention warning for password
+            print('ATTENTION: you will be asked to provide your sudo password in just a second')
+
+            # install virtualbox driver
+            installed_vb = self.__install_driver(file_name)
+
+            # check if it worked
+            if installed_vb:
+
+                # print message
+                print ('Successfully installed VirtualBox Driver')
+
+            # break the function if it didn't work
+            else:
+
+                # raise error
+                raise Exception('I could not install VirtualBox')
+
+        # check if kubectl is already installed
+        if self.kc_installed:
 
             # print message
-            print ('Successfully installed VirtualBox Driver')
+            print ('Kubectl is already installed')
 
-        # break the function if it didn't work
+        # if it is not installed
         else:
 
-            # raise error
-            raise Exception('I could not install VirtualBox')
+            # install kubectl
+            install_kc = self.__install_kubectl()
 
-        # install kubectl
-        install_kc = self.__install_kubectl()
+            # check if it worked
+            if install_kc:
 
-        # check if it worked
-        if install_kc:
+                # print message
+                print ('Successfully installed kubectl')
+
+            # break function if it didn't work
+            else:
+
+                # raise error
+                raise Exception('I could not install kubectl, check if you have Homebrew installed')
+
+        # check if minikube is already installed
+        if self.mk_installed:
 
             # print message
-            print ('Successfully installed kubectl')
+            print ('Minikube is already installed')
 
-        # break function if it didn't work
+        # if it is not installed
         else:
 
-            # raise error
-            raise Exception('I could not install kubectl, check if you have Homebrew installed')
+            # install minikube
+            install_mk = self.__install_minikube()
 
-        # install minikube
-        install_mk = self.__install_minikube()
+            # check if it worked
+            if install_mk:
 
-        # check if it worked
-        if install_mk:
+                # print message
+                print ('Successfully installed minikube')
 
-            # print message
-            print ('Successfully installed minikube')
+            # break function if it didn't work
+            else:
 
-        # break function if it didn't work
-        else:
-
-            # raise error
-            raise Exception('I could not install minikube')
+                # raise error
+                raise Exception('I could not install minikube')
 
         # update status
         self.status = 'installed'

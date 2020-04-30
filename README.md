@@ -1,16 +1,21 @@
-# KubiPy - Orchestrate Kubernetes from Python <img src="docs/kubipy_sticker.png" width=170 align="right" />
+# KubiPy - Manage Minikube for macOS <img src="docs/kubipy_sticker.png" width=170 align="right" />
 
 [![Version](https://img.shields.io/pypi/v/kubipy.svg)](https://pypi.org/project/kubipy/)
 [![License](https://img.shields.io/pypi/l/kubipy.svg)](https://raw.githubusercontent.com/LJstroemsdoerfer/kubipy/master/LICENSE)
 [![Status](https://img.shields.io/badge/status-stable-green.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
 [![macOS](https://img.shields.io/badge/macOS-stable-green.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
-[![Ubuntu 18.04](https://img.shields.io/badge/Ubuntu%2018.04-in%20progress-grey.svg?maxAge=3600)](https://pypi.org/project/kubipy/)
 
-KubiPy helps you to manage your local Kubernetes Cluster fully from Python. It provides an interface to Minikube and allows you to setup and manage a cluster without leaving Python. This is immensively helpful to enable local testing. You can install the library via pip: <code>pip install kubipy</code>.
+KubiPy helps you to manage Minikube clusters on macOS, all without leaving Python. It provides an interface to Minikube and allows you to setup and manage a cluster. This is immensively helpful to enable local testing of Python applications, before shipping them to a fully-fledged Kubernetes Cluster. This way, you generate a local Kubernetes test environment in a matter of minutes.
+
+The KubiPy interface allows you to not only install Minikube and all components, but also coordinates and sporns all components.
 
 ## Usage
 
-KubiPy provides a standard Python interface to the setup process of your local Kubernetes cluster. KubiPy provides the <code>minipy()</code> class. Once initiated this class is the core of all your operations. While running these commands you will need your sudo password, so keep it close by.
+KubiPy is hosted on PyPi and the Python 3.6 version can be installed via pip:
+
+    pip install kubipy
+
+KubiPy provides the <code>minipy()</code> class. Once initiated this class is the core of all your operations. While running these commands you will need your sudo password, so keep it close by.
 
     # initiate the class 
     cluster = minipy()
