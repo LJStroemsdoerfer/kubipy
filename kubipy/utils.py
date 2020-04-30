@@ -79,6 +79,9 @@ class minipy:
 
             # print welcome message
             print(welcome_message)
+
+        # screen for already installed components
+        self.__check_installed()
     
     # define pivate method to check if components already exists
     def __check_installed(self):
