@@ -6,7 +6,7 @@ Slots:
 --------
 description: str
     Gives a little description
-url_mac: str
+url: str
     Download URL for the VirtualBox driver
 OS: str
     Stores the platform the user is running on
@@ -36,13 +36,14 @@ class minipy:
         
         # define the slots
         self.description = 'local kubernetes cluster'
-        self.url_mac = 'https://download.virtualbox.org/virtualbox/6.1.6/VirtualBox-6.1.6-137129-OSX.dmg'
+        self.url = 'https://download.virtualbox.org/virtualbox/6.1.6/VirtualBox-6.1.6-137129-OSX.dmg'
         self.OS = platform
         self.wd = os.getcwd()
         self.current_status = 'initialized'
         self.vb_installed = None
         self.kc_installed = None
         self.mk_installed = None
+        self.dk_installed = None
 
         # welcome message
         welcome_message = """
@@ -91,7 +92,7 @@ class minipy:
         try: 
 
             # check if cli is recognized
-            command = ('virtualbox --help')
+            command = str('virtualbox --help')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # installed if not crashed
@@ -107,7 +108,7 @@ class minipy:
         try:
 
             # check if cli is recognized
-            command = ('kubectl config view')
+            command = str('kubectl config view')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # installed if not crashed
@@ -123,7 +124,7 @@ class minipy:
         try: 
 
             # check if cli is recognized
-            command = ('minikube version')
+            command = str('minikube version')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # installed if not crashed
@@ -135,10 +136,27 @@ class minipy:
             # not installed
             mk_installed = False
 
+        # check if docker is installed
+        try:
+
+            # check if cli is recognized
+            command = str('docker version')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # installed if not crashed
+            dk_installed = True
+
+        # handle exception
+        except:
+
+            # not installed
+            dk_installed = False
+
         # store info in object
         self.vb_installed = vb_installed
         self.kc_installed = kc_installed
         self.mk_installed = mk_installed
+        self.dk_installed = dk_installed
 
     # define private method to download file
     def __download_driver(self, url, file_name):
@@ -284,6 +302,41 @@ class minipy:
             # return
             return False
 
+    # function to install docker
+    def __install_docker(self):
+
+        """
+        Private Method to install docker.
+
+        This function downloads and installs docker on the host machine.
+
+        Returns
+        -------
+        boolean
+            Returns 'True' if successfully installed, otherwise 'False'
+
+        """
+        
+        # try to install docker
+        try:
+
+            # install docker
+            command = str('brew cask install docker')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # start docker deamon
+            command = str('open /Applications/Docker.app')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # return True
+            return True
+        
+        # return False if it did not work
+        except:
+
+            # return False
+            return False
+
     # function to install kubectl
     def __install_kubectl(self):
 
@@ -304,7 +357,7 @@ class minipy:
         try:
 
             # install kubectl
-            command = 'brew install kubectl'
+            command = str('brew install kubectl')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
@@ -336,7 +389,7 @@ class minipy:
         try:
 
             # install minikube
-            command = 'brew install minikube'
+            command = str('brew install minikube')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return 
@@ -359,6 +412,60 @@ class minipy:
 
         """
 
+        # print message
+        info_message = """
+
+                            ___________________________________________
+           / \\__           | I am KubiDog, your Best Friend!           |
+          (    @\\____      | I will guide you through the installation!|
+          /          O      ------------------------------------------- 
+         /   (______/       
+        /_____/   U
+
+        """
+
+        # print info message
+        print (info_message)
+
+        # test if Docker needs to be installed
+        if self.dk_installed:
+
+            # print message
+            print ('Docker is already installed')
+
+        # if it is not installed
+        else:
+
+            # build info message
+            info_message = """
+
+                ____________________________________________________________
+               | For just a couple of seconds you will leave Python. Docker |
+               | comes with a handy UI. You will need Docker to build and   |
+               | deploy containers to Minikube. If you want to know more    |
+               | about Docker visit https://www.docker.com/.                |
+                ------------------------------------------------------------
+                                                                            
+            """
+
+            # print info about graphical interface
+            print (info_message)
+
+            # install docker
+            installed_dk = self.__install_docker()
+
+            # check if it worked
+            if installed_dk:
+
+                # print message
+                print ('Successfully installed Docker')
+
+            # break the function if it didn't work
+            else:
+
+                # raise Exception
+                raise Exception('I could not install Docker')
+
         # test if VirtualBox needs to be installed
         if self.vb_installed:
 
@@ -367,21 +474,25 @@ class minipy:
 
         # if it is not installed
         else:
+
+            # build info message
+            info_message = """
+
+                ____________________________________________________________
+               | VirtualBox will be installed now. I am downloading the     |
+               | binary from: https://www.virtualbox.org/wiki/Downloads.    |
+                ------------------------------------------------------------
+                                                                            
+            """
+
+            # print info about graphical interface
+            print (info_message)
             
-            # check if platform is macOS
-            if platform == 'darwin':
+            # get the url
+            url = self.url
 
-                # set the binary download to the macOS file
-                url = self.url_mac
-
-                # define file ending
-                ending = '.dmg'
-
-            # else
-            else:
-
-                # exit function
-                raise Exception('Currently only MacOS is supported')
+            # get the ending
+            ending = '.dmg'
 
             # create a new directory
             tmp_dir_name = self.__create_temp_dir()
@@ -410,8 +521,18 @@ class minipy:
                 # raise error
                 raise Exception('I could not download VirtualBox!')
 
-            # print attention warning for password
-            print('ATTENTION: you might be asked to provide your sudo password in just a second')
+             # build info message
+            info_message = """
+
+                ____________________________________________________________
+               | ATTENTION: you might be asked to provide your sudo pass in |
+               | just a second.                                             |
+                ------------------------------------------------------------
+
+            """
+            
+            # print info about graphical interface
+            print (info_message)           
 
             # install virtualbox driver
             installed_vb = self.__install_driver(file_name)
@@ -437,6 +558,20 @@ class minipy:
         # if it is not installed
         else:
 
+             # build info message
+            info_message = """
+
+                ____________________________________________________________
+               | I will download kubectl as your kubernetes cli. If you     |
+               | want to learn more about kubectl, you can visit:           |                 
+               | https://kubernetes.io/docs/reference/kubectl/overview/     |                                   |
+                ------------------------------------------------------------
+                                                                            
+            """
+
+            # print info about graphical interface
+            print (info_message)
+
             # install kubectl
             install_kc = self.__install_kubectl()
 
@@ -460,6 +595,21 @@ class minipy:
 
         # if it is not installed
         else:
+
+            # build info message
+            info_message = """
+
+                ____________________________________________________________
+               | I will install Minikube now using brew. If you want to     |
+               | learn more about Minikube, you can visit:                  |
+               | https://minikube.sigs.k8s.io/docs/                         |
+                ------------------------------------------------------------
+                                                                            
+            """
+
+            # print info about graphical interface
+            print (info_message)
+
 
             # install minikube
             install_mk = self.__install_minikube()
@@ -547,7 +697,7 @@ class minipy:
         try:
 
             # check minikube status
-            command = 'minikube status'
+            command = str('minikube status')
             subprocess.call(command.split())
 
         # except
@@ -617,7 +767,7 @@ class minipy:
             raise Exception('I could not stop minikube')
 
     # function to delete minikube
-    def delete(self, cli = True, driver = True):
+    def delete(self, docker = None, kubectl = None, virtualbox = None):
 
         """
         Main method to delete Minikube and all dependencies.
@@ -634,6 +784,69 @@ class minipy:
             
         """
 
+        # check if user provided input
+        if docker is None:
+
+            # check if docker was already installed
+            if self.dk_installed:
+
+                # do not delete docker
+                docker = False
+
+            # if it was not installed delete it
+            else:
+
+                # delete docker
+                docker = True
+            
+        # if user provided input
+        else:
+
+            # keep user input
+            docker = docker
+
+        # check if user provided input
+        if kubectl is None:
+
+            # check if kubectl was installed
+            if self.kc_installed:
+
+                # do not delete kubectl
+                kubectl = False
+            
+            # if it was not installed delete it
+            else:
+
+                # delete kubectl
+                kubectl = True
+
+        # if user provided input
+        else:
+
+            # keep user input
+            kubectl = kubectl
+
+        # check if user provided input
+        if virtualbox is None:
+                
+            # check if virtualbix was installed
+            if self.vb_installed:
+
+                # do not delete virtualbox
+                virtualbox = False
+            
+            # if it was not installed delete it
+            else:
+
+                # delete virtualbox
+                virtualbox = True
+
+        # if user provided input
+        else:
+
+            # keep user input
+            virtualbox = virtualbox
+        
         # try to delete minikube
         try:
 
@@ -645,8 +858,15 @@ class minipy:
             command = str('minikube delete')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
+            # check if docker should also be deleted
+            if docker:
+                
+                # delete docker
+                command = str('/Applications/Docker.app/Contents/MacOS/Docker --uninstall')
+                subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
             # check if cli should also be deleted
-            if cli:
+            if kubectl:
                 
                 # delete all remittant files
                 command = str('rm -rf ~/.kube ~/.minikube')
@@ -676,7 +896,7 @@ class minipy:
                 print ('cli kept alive on your machine')
 
             # check if driver should be deleted
-            if driver:
+            if virtualbox:
 
                 # try to delete driver
                 try:
