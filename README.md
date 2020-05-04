@@ -11,7 +11,7 @@ The KubiPy interface allows you to not only install Minikube and all components,
 
 ## Usage
 
-KubiPy is hosted on PyPi and the Python 3.6 version can be installed via pip:
+KubiPy is available on PyPi as <code>kubipy</code>. So you can run your regular <code>pip</code> command.
 
     pip install kubipy
 
