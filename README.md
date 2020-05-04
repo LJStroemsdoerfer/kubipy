@@ -40,6 +40,7 @@ KubiPy provides the <code>minipy()</code> class. Once initiated this class is th
 Minikube depends on numerous components to run. The provision and configuration of these components is handled by KubiPy. However, you should be aware of what happens. 
 
 <ol>
+    <li>KubiPy needs a container technology to containerize scripts. To do so, KubiPy installs <a href="https://docs.docker.com/">Docker</a>.</li>
     <li>KubiPy installs a driver that is needed to host a Kubernetes cluster on your machine. KubiPy uses <a href="https://www.virtualbox.org/">VirtualBox</a> to do so.</li>
     <li>KubiPy relies on the Kubernetes-CLI <code>kubectl</code>. This is installed using the package manager <code>Homebrew</code> for macOS.</li>
     <li>KubiPy of course relies on <code>Minikube</code>. This is installed via <code>Homebrew</code> as well.</li>
@@ -60,20 +61,12 @@ KubiPy is under active development and <b>supports</b> currently only <b>macOS</
 
 ## Next Steps
 
-### Version 0.2
-<ul>
-    <li>Minikube project creation</li>
-    <li>Minikube project management</li>
-</ul>
-
-### Version 0.3
-<ul>
-    <li>Docker component</li>
-    <li>Docker config management</li>
-</ul>
-
 ### Version 1.0
 <ul>
+    <li>Minikube project management</li>
+    <li>Minikube service management</li>
+    <li>Docker image creation</li>
+    <li>Docker image pushing</li>
     <li>API deployment to minikube</li>
 </ul>
 

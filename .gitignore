@@ -6,6 +6,9 @@ __pycache__/
 # deployment folder
 deployment/
 
+# profraw file
+default.profraw
+
 # vs code files
 .vscode/
 
