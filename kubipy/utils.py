@@ -19,6 +19,9 @@ kc_installed : boolean
 mk_installed : boolean
     Stores if minikube is already installed
 py_version : string
+    Stores the version of Python in use
+service_url : string
+    Stores the service url
 """
 
 # import libs
@@ -42,6 +45,7 @@ class minipy:
         self.dk_installed = None
         self.py_version = None
         self.dk_file_path = None
+        self.service_url = None
 
         # welcome message
         welcome_message = """
@@ -693,7 +697,7 @@ class minipy:
             COPY {script_file} /api/api.py
             COPY {requirements_file} /api/requirements.txt
 
-            RUN python -m pip install /api/requirements.txt
+            RUN python -m pip install -r /api/requirements.txt
 
             EXPOSE {port}
 
@@ -773,8 +777,8 @@ class minipy:
         try:
 
             # create a new deployment
-            command = str('kubectl create deployment ' + deployment_name + ' --image=kubipy-image:latest')
-            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            command = str('kubectl run ' + deployment_name + " --image=kubipy-image:latest --image-pull-policy='Never'")
+            os.system(command)
 
             # return True
             return True
@@ -806,7 +810,7 @@ class minipy:
         try:
 
             # expose the service
-            command = str('kubectl expose deployment ' + deployment_name + ' --port=' + port)
+            command = str('kubectl expose pod ' + deployment_name + ' --port=' + port + ' --type=NodePort')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return True
@@ -818,6 +822,46 @@ class minipy:
             # return False
             return False
 
+    # helper function to build the url
+    def __get_url(self, deployment_name):
+
+        """
+        Private method to get the url of a deployment.
+
+        This function exposes the service on a minikube level an retreives
+        the url.
+
+        Parameters
+        ----------
+        deployment_name : string
+            String with the name of the deployment
+        """
+
+        # try to expose the service on minikube
+        try:
+
+            # expose the service on minikube
+            command = str('minikube service ' + deployment_name + ' --url')
+            service_url = subprocess.check_output(command.split())
+
+            # decode url
+            service_url = str(service_url.decode("utf-8")).replace("\n", "")
+            
+            # add route warning
+            service_url = service_url + str('/<your_route>')
+
+            # write the url to self
+            self.service_url = service_url
+
+            # return the url
+            return True
+
+        # if it didn't work
+        except:
+
+            # return False
+            return False
+    
     # helper function to check if service exists
     def __check_service(self, deployment_name):
 
@@ -837,11 +881,20 @@ class minipy:
         try:
 
             # check for service
-            command = str('kubectl get service kubipy-deployment')
-            subprocess.call(command.split())
-        
-            # return True
-            return True
+            command = str('kubectl get service ' + deployment_name)
+            exists = subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # check result
+            if exists == 0:
+
+                # return True
+                return True
+
+            # if not 0, then False
+            else:
+
+                # return False
+                return False
         
         # if it breaks, it doesn't exist
         except:
@@ -868,11 +921,20 @@ class minipy:
         try:
 
             # check for service
-            command = str('kubectl get deployment kubipy-deployment')
-            subprocess.call(command.split())
-        
-            # return True
-            return True
+            command = str('kubectl get deployment ' + deployment_name)
+            exists = subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # check result
+            if exists == 0:
+
+                # return False
+                return True
+            
+            # if not 0, then False
+            else:
+
+                # return False
+                return False
         
         # if it breaks, it doesn't exist
         except:
@@ -941,10 +1003,15 @@ class minipy:
                 # print out first line
                 info_message = """\
 
-                    This is the file you want to deploy:
+                    This is the first line of the file you want to deploy:
 
-                    {first_line}\
+                    -------------------------
+                    {first_line}
+                    -------------------------\
                 """.format(first_line = first_line)
+
+                # print info message
+                print (info_message)
 
             # handle exception
             except:
@@ -978,10 +1045,15 @@ class minipy:
                 # print out first line
                 info_message = """\
 
-                    This is the requirements file:
+                    This is the first line of your requirements file:
 
-                    {first_line}\
+                    -------------------------
+                    {first_line}
+                    -------------------------\
                 """.format(first_line = first_line)
+
+                # print info message
+                print (info_message)
 
             # handle exception
             except:
@@ -1009,7 +1081,7 @@ class minipy:
             info_message = """
 
                                    ___________________________________________
-                                  | API will be deployed on localhost:{port}  |
+                                  | API will be deployed on {port}            |
                                    -------------------------------------------
                                                                                 
             """.format(port = port)
@@ -1113,7 +1185,7 @@ class minipy:
             self.delete_object(service = deployment_name)
 
         # expose service
-        exposed_sv = self.__expose_service(port, deployment_name)
+        exposed_sv = self.__expose_service(port, deployment_name = deployment_name)
 
                 # check if it worked
         if exposed_sv:
@@ -1135,15 +1207,30 @@ class minipy:
             # raise Exception
             raise Exception('I could not expose the service')
 
-        # info message
-        info_message = """
+        # get the service url
+        url_exposed = self.__get_url(deployment_name = deployment_name)
 
-                  ____________________________________________________________
-                 | Your deployment is ready and you can access the API via:   |
-                 | localhost:{port}                                           |
-                  ------------------------------------------------------------
+        # check if it worked
+        if url_exposed:
 
-        """.format(port = port)
+            # info message
+            info_message = """
+
+                    ____________________________________________________________
+                    | Your deployment is ready and you can access the API via:   |
+                    | {url}                                                      |
+                    ------------------------------------------------------------
+
+            """.format(url = self.service_url)
+
+            # print message
+            print (info_message)
+
+        # if it didn't work
+        else:
+
+            # raise Exception
+            raise Exception('I could not get the url of the service')
 
     # function to list all deployments
     def get_deployments(self):

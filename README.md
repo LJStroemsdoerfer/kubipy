@@ -26,6 +26,12 @@ KubiPy provides the <code>minipy()</code> class. Once initiated this class is th
     # start the cluster
     cluster.start()
 
+    # deploy an API
+    cluster.deploy(script_file = "api.py",
+                   requirements_file = "requirements.txt",
+                   port = "8000",
+                   deployment_name = "my-deployment")
+
     # open the dashboard
     cluster.dashboard()
 
@@ -56,6 +62,11 @@ KubiPy is under active development and <b>supports</b> currently only <b>macOS</
     <li><code>stop()</code></li>
     <li><code>dashboard()</code></li>
     <li><code>status()</code></li>
+    <li><code>deploy()</code></li>
+    <li><code>get_pods()</code></li>
+    <li><code>get_services()</code></li>
+    <li><code>get_deployments()</code></li>
+    <li><code>delete_object()</code></li>
     <li><code>delete()</code></li>
 </ul>
 
