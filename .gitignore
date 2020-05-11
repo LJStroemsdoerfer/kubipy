@@ -6,6 +6,9 @@ __pycache__/
 # deployment folder
 deployment/
 
+# test Dockerfile
+Dockerfile
+
 # profraw file
 default.profraw
 

@@ -4,27 +4,27 @@ setup and manage minikube clusters.
 
 Slots:
 --------
-description: str
+description : str
     Gives a little description
-OS: str
+OS : str
     Stores the platform the user is running on
-wd: str
+wd : str
     Stores the current working directory
-current_status: str
+current_status : str
     Stores the current status of the minikube cluster
-vb_installed: boolean
+vb_installed : boolean
     Stores if VirtualBox is already installed
-kc_installed: boolean
+kc_installed : boolean
     Stores if kubectl is already installed
-mk_installed: boolean
+mk_installed : boolean
     Stores if minikube is already installed
+py_version : string
 """
 
 # import libs
 import subprocess
 import os
-from requests import get
-from sys import platform
+import sys
 
 # setup class
 class minipy:
@@ -34,13 +34,14 @@ class minipy:
         
         # define the slots
         self.description = 'local kubernetes cluster'
-        self.OS = platform
         self.wd = os.getcwd()
         self.current_status = 'initialized'
         self.vb_installed = None
         self.kc_installed = None
         self.mk_installed = None
         self.dk_installed = None
+        self.py_version = None
+        self.dk_file_path = None
 
         # welcome message
         welcome_message = """
@@ -77,6 +78,14 @@ class minipy:
 
             # print welcome message
             print(welcome_message)
+
+        # check python version
+        major_v = str(sys.version_info[0])
+        minor_v = str(sys.version_info[1])
+        micro_v = str(sys.version_info[2])
+
+        # write to slot
+        self.py_version = str(major_v + '.' + minor_v + '.' + micro_v)
 
         # screen for already installed components
         self.__check_installed()
@@ -243,6 +252,10 @@ class minipy:
 
             # install kubectl
             command = str('brew install kubectl')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # link to the version
+            command = str('brew link kubernetes-cli')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
@@ -637,6 +650,630 @@ class minipy:
             # print message
             print ('Minikube cluster is not responding')
 
+    # helper function to build dockerfile
+    def __build_dockerfile(self, script_file, requirements_file, port):
+
+        """
+        Private method to build a Dockerfile.
+
+        This function first builds a Docker file from a python script and 
+        a requirements.txt.
+
+        Parameters
+        ----------
+        script_file : string
+            String with the path to the python script file
+        requirements_file : string
+            String with the path to the requirements file
+        port : string
+            String with the port number to expose
+
+        """
+
+        # try to write Dockerfile
+        try:
+
+            # Dockerfile path
+            dk_file_path = str(self.wd + '/Dockerfile')
+
+            # open empty Dockerfile
+            command = str('touch ' + dk_file_path)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # ensure that there is no tilde (Docker does not like it)
+            script_file = script_file.replace('~','')
+            requirements_file = requirements_file.replace('~', '')
+            
+            # write content
+            content = """\
+            FROM python:{version}
+
+            RUN mkdir -p /api
+
+            COPY {script_file} /api/api.py
+            COPY {requirements_file} /api/requirements.txt
+
+            RUN python -m pip install /api/requirements.txt
+
+            EXPOSE {port}
+
+            ENTRYPOINT ["python", "api/api.py"]\
+            """.format(version=self.py_version,
+                    script_file = script_file,
+                    requirements_file = requirements_file,
+                    port = int(port))
+
+            # open Dockerfile
+            file = open(dk_file_path, "w")
+
+            # write content to Dockerfile
+            file.write(content)
+
+            # close connection
+            file.close()
+
+            # write file path to self
+            self.dk_file_path = dk_file_path
+
+            # return True
+            return True
+
+        # handle exception
+        except:
+
+            # return False
+            return False
+
+    # helper function to build Docker image from Dockerfile
+    def __build_image(self):
+
+        """
+        Private method to build a Docker image from a Dockefile.
+
+        This function builds a Docker image from a Dockerfile.
+
+        """
+
+        # try to build a Docker image
+        try:
+
+            # make sure this is executed in the wd
+            os.chdir(self.wd)
+
+            # build docker image from file
+            command = str('eval $(minikube -p minikube docker-env) && docker build -t kubipy-image:latest .')
+            os.system(command)
+
+            # return True
+            return True
+
+        # handle exceptiom
+        except:
+
+            # return False
+            return False
+        
+    # helper function to create a new deployment
+    def __create_deployment(self, deployment_name):
+
+        """
+        Private method to create a deployment.
+
+        This function creates a deployment on Minikube based on the previously
+        built Docker image.
+
+        Parameters
+        ----------
+        deployment_name : string
+            String with the name of the deployment
+
+        """
+
+        # try to create a new deployment
+        try:
+
+            # create a new deployment
+            command = str('kubectl create deployment ' + deployment_name + ' --image=kubipy-image:latest')
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # return True
+            return True
+        
+        # handle exception
+        except:
+
+            # return False
+            return False
+
+    # helper function to expose service
+    def __expose_service(self, port, deployment_name):
+
+        """
+        Private method to expose a deployment.
+
+        This function exposes the deployment in Minikube to make it accessible
+        from outside the Minikube cluster.
+
+        Parameters
+        ----------
+        port : string
+            String with the port number to expose
+        deployment_name : string
+            String with the name of the deployment
+        """
+
+        # try to expose service
+        try:
+
+            # expose the service
+            command = str('kubectl expose deployment ' + deployment_name + ' --port=' + port)
+            subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            # return True
+            return True
+        
+        # handle exception
+        except:
+
+            # return False
+            return False
+
+    # helper function to check if service exists
+    def __check_service(self, deployment_name):
+
+        """
+        Private method to check if service exists.
+
+        This function checks, if a service already exists on Minikube.
+
+        Parameters
+        ----------
+        deployment_name : string
+            String with the name of the deployment
+
+        """
+
+        # try to check if service exists
+        try:
+
+            # check for service
+            command = str('kubectl get service kubipy-deployment')
+            subprocess.call(command.split())
+        
+            # return True
+            return True
+        
+        # if it breaks, it doesn't exist
+        except:
+
+            # return False
+            return False
+
+    # helper function to check if deployment exists
+    def __check_deployment(self, deployment_name):
+
+        """
+        Private method to check if deployment exists.
+
+        This function checks, if a deployment already exists on Minikube.
+
+        Parameters
+        ----------
+        deployment_name : string
+            String with the name of the deployment
+
+        """
+
+        # try to check if service exists
+        try:
+
+            # check for service
+            command = str('kubectl get deployment kubipy-deployment')
+            subprocess.call(command.split())
+        
+            # return True
+            return True
+        
+        # if it breaks, it doesn't exist
+        except:
+
+            # return False
+            return False
+
+
+    # function to deploy app
+    def deploy(self, script_file, requirements_file, port, deployment_name = None):
+
+        """
+        Main method to deploy APIs to minikube.
+
+        This function first builds a Docker image from a python script and 
+        a requirements.txt. This image is then deployed on the minikube
+        cluster.
+
+        Parameters
+        ----------
+        script_file : string
+            String with the path to the python script file
+        requirements_file : string
+            String with the path to the requirements file
+        port : string
+            String with the port number to expose
+
+        """
+
+        # check if deployment name was given
+        if deployment_name is None:
+
+            # assign default
+            deployment_name = "kubipy-deployment"
+
+        # if it was given
+        else:
+
+            # take care of special characters
+            deployment_name = deployment_name.replace('_', '-').replace('/', '-')
+
+        # build info message
+        info_message = """
+
+                  ____________________________________________________________
+                 | To deploy your image, you will need to be logged in to     |
+                 | Docker. So please, login if you have an account, or sign   |
+                 | up, if you do not have an account yet.                     |
+                  ------------------------------------------------------------
+                                                                            
+        """
+
+        # print info about graphical interface
+        print (info_message)
+
+        # check script_file input
+        if isinstance(script_file, str):
+
+            # try to read in the first line
+            try:
+
+                # read in file
+                with open(script_file) as file:
+                    first_line = file.readline()
+
+                # print out first line
+                info_message = """\
+
+                    This is the file you want to deploy:
+
+                    {first_line}\
+                """.format(first_line = first_line)
+
+            # handle exception
+            except:
+
+                # handle exception
+                raise Exception('I could not find the script_file')
+
+        # if script_file input is the wrong format
+        else:
+
+            # raise Exception
+            raise Exception("""
+
+            script_file should be a path and filename to your python api
+            script, that you want to deploy.
+
+            e.g. /your_folder/your_script.py
+            
+            """)
+
+        # check requirements_file input
+        if isinstance(requirements_file, str):
+
+            # try to read in the first line
+            try:
+
+                # read in file
+                with open(requirements_file) as file:
+                    first_line = file.readline()
+
+                # print out first line
+                info_message = """\
+
+                    This is the requirements file:
+
+                    {first_line}\
+                """.format(first_line = first_line)
+
+            # handle exception
+            except:
+
+                # handle exception
+                raise Exception('I could not find the script_file')
+
+        # if script_file input is the wrong format
+        else:
+
+            # raise Exception
+            raise Exception("""
+
+            script_file should be a path and filename to your python api
+            script, that you want to deploy.
+
+            e.g. /your_folder/your_requirements.txt
+            
+            """)
+
+        # check port input
+        if isinstance(port, str):
+
+            # build info message
+            info_message = """
+
+                                   ___________________________________________
+                                  | API will be deployed on localhost:{port}  |
+                                   -------------------------------------------
+                                                                                
+            """.format(port = port)
+
+            # print info about graphical interface
+            print (info_message)
+
+        # else if port input is the wrong fromat
+        else:
+
+            # raise Exception
+            raise Exception('port should be just a string such as "8000"')
+
+        # build Dockerfile
+        built_dk = self.__build_dockerfile(script_file = script_file,
+                                           requirements_file = requirements_file,
+                                           port = port)
+
+        # check if it worked
+        if built_dk:
+
+            # build info message
+            info_message = """
+                                   ___________________________________________
+                                  | Successfully built Dockerfile             |
+                                   -------------------------------------------
+
+            """
+
+            # print info message
+            print (info_message)
+
+        # break the function if it didn't work
+        else:
+
+            # raise Exception
+            raise Exception('I could not built a Dockerfile')
+        
+        # built docker image
+        built_di = self.__build_image()
+
+        # check if it worked
+        if built_di:
+
+            # build info message
+            info_message = """
+                                   ___________________________________________
+                                  | Successfully built Docker image           |
+                                   -------------------------------------------
+
+            """
+
+            # print info message
+            print (info_message)
+
+        # break the function if it didn't work
+        else:
+
+            # raise Exception
+            raise Exception('I could not built a Docker image')
+
+        # check if deployment already exists
+        exists_dp = self.__check_deployment(deployment_name = deployment_name)
+
+        # delete if exists
+        if exists_dp:
+
+            # delete deployment
+            self.delete_object(deployment = deployment_name)
+
+        # create deployment
+        created_dp = self.__create_deployment(deployment_name = deployment_name)
+
+        # check if it worked
+        if created_dp:
+
+            # build info message
+            info_message = """
+                                   ___________________________________________
+                                  | Successfully created deployment           |
+                                   -------------------------------------------
+
+            """
+
+            # print info message
+            print (info_message)
+
+        # break the function if it didn't work
+        else:
+
+            # raise Exception
+            raise Exception('I could not create a deployment')
+
+        # check if service already exists
+        exists_sv = self.__check_service(deployment_name = deployment_name)
+
+        # delete if exists
+        if exists_sv:
+
+            # delete service
+            self.delete_object(service = deployment_name)
+
+        # expose service
+        exposed_sv = self.__expose_service(port, deployment_name)
+
+                # check if it worked
+        if exposed_sv:
+
+            # build info message
+            info_message = """
+                                   ___________________________________________
+                                  | Successfully expose                       |
+                                   -------------------------------------------
+
+            """
+
+            # print info message
+            print (info_message)
+
+        # break the function if it didn't work
+        else:
+
+            # raise Exception
+            raise Exception('I could not expose the service')
+
+        # info message
+        info_message = """
+
+                  ____________________________________________________________
+                 | Your deployment is ready and you can access the API via:   |
+                 | localhost:{port}                                           |
+                  ------------------------------------------------------------
+
+        """.format(port = port)
+
+    # function to list all deployments
+    def get_deployments(self):
+
+        """
+        Main method to get deployments on Minikube
+
+        This function calls the standard kubectl get deployments command.
+
+        """
+
+        # try to get deployments
+        try:
+
+            # get deployments
+            command = str('kubectl get deployments')
+            subprocess.call(command.split())
+
+        # handle exception
+        except:
+
+            # raise Exception
+            raise Exception('I could not get the list of deployments')
+
+    # function to list all services
+    def get_services(self):
+
+        """
+        Main method to get services on Minikube
+
+        This function calls the standard kubectl get services command.
+
+        """
+
+        # try to get services
+        try:
+
+            # get services
+            command = str('kubectl get services')
+            subprocess.call(command.split())
+
+        # handle exception
+        except:
+
+            # raise Exception
+            raise Exception('I could not get the list of services')
+
+
+    # function to list all services
+    def get_pods(self):
+
+        """
+        Main method to get pods on Minikube
+
+        This function calls the standard kubectl get pods command.
+
+        """
+
+        # try to get services
+        try:
+
+            # get services
+            command = str('kubectl get pods')
+            subprocess.call(command.split())
+
+        # handle exception
+        except:
+
+            # raise Exception
+            raise Exception('I could not get the list of pods')
+
+
+    # function to delete pods, services
+    def delete_object(self, pod = None, service = None, deployment = None):
+
+        """
+        Main method to delete pods, deployments and services on Minikube
+
+        This function calls the standard kubectl delete command.
+
+        """
+
+        # check if pod is specified
+        if pod is not None:
+
+            # try to delete pod
+            try:
+
+                # delete pod
+                command = str('kubectl delete pod ' + pod)
+                subprocess.call(command.split())
+
+            # handle exception
+            except:
+
+                # raise Exception
+                raise Exception('I could not delete your pod')
+
+        # check if service is specified
+        if service is not None:
+
+            # try to delete service
+            try:
+
+                # delete service
+                command = str('kubectl delete service ' + service)
+                subprocess.call(command.split())
+
+            # handle excpetion
+            except:
+
+                # raise Exception
+                raise Exception('I could not delete your service')
+
+        # check if pod is specified
+        if deployment is not None:
+
+            # try to delete pod
+            try:
+
+                # delete pod
+                command = str('kubectl delete deployment ' + deployment)
+                subprocess.call(command.split())
+
+            # handle exception
+            except:
+
+                # raise Exception
+                raise Exception('I could not delete your deployment')
+
     # function to start minikube dashboard
     def dashboard(self):
 
@@ -803,7 +1440,7 @@ class minipy:
                     info_message = """
 
                                    ___________________________________________
-                                  | Successfully deleted Docker               |
+                                  | Successfully removed Docker               |
                                    -------------------------------------------
                                                                                     
                     """
@@ -897,7 +1534,7 @@ class minipy:
 
                     # uninstall VirtualBox
                     command = str('brew cask uninstall virtualbox --force')
-                    subprocess.call(command.split())
+                    subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
                     # build info message
                     info_message = """
