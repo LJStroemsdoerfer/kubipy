@@ -1,7 +1,6 @@
 """
 utils.py contains the base class minipy(), which provides the core functions to
 setup and manage minikube clusters.
-
 Slots:
 --------
 description : str
@@ -49,9 +48,7 @@ class minipy:
 
         # welcome message
         welcome_message = """
-
                                     Welcome to 
-
                     ██╗  ██╗██╗   ██╗██████╗ ██╗██████╗ ██╗   ██╗
                     ██║ ██╔╝██║   ██║██╔══██╗██║██╔══██╗╚██╗ ██╔╝
                     █████╔╝ ██║   ██║██████╔╝██║██████╔╝ ╚████╔╝ 
@@ -59,20 +56,16 @@ class minipy:
                     ██║  ██╗╚██████╔╝██████╔╝██║██║        ██║   
                     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝        ╚═╝   
                                                                 
-
         KubiPy helps you to setup and work with Minikube from your Python 
         interface. Especially for testing purposes and exploration this is
         extremely helpful. With a few Python commands you have a running
         local Kubernetes cluster and can deploy APIs.
-
         KubiPy helps you to start your very own local Kubernetes cluster. This
         is done using Minikube. The driver we use is VirtualBox. We also install
         kubectl as a command line tool. So if you are getting bored with Python
         you can interact with your Minikube cluster from the command line.
-
         If you have any questions, please get in contact on GitHub, there you
         can also find all the code: https://github.com/LJStroemsdoerfer/kubipy
-
         Thank you for using KubiPy and have fun with it!
     
         """
@@ -173,15 +166,11 @@ class minipy:
 
         """
         Private Method to install VirtualBox driver.
-
         This function downloads the binary using homebrew.
-
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
 
         # try to install driver
@@ -205,14 +194,11 @@ class minipy:
 
         """
         Private Method to install docker.
-
         This function downloads and installs docker on the host machine.
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
         
         # try to install docker
@@ -240,15 +226,12 @@ class minipy:
 
         """
         Private Method to install kubernetes-cli.
-
         This function downloads and installs kubectl as a kubernetes cli. The 
         cli is installed using the macOS package manager Homebrew.
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
 
         # try to install kubectl
@@ -259,7 +242,7 @@ class minipy:
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # link to the version
-            command = str('brew link kubernetes-cli')
+            command = str('brew link --overwrite kubernetes-cli')
             subprocess.call(command.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
             # return
@@ -276,15 +259,12 @@ class minipy:
 
         """
         Private Method to install minikube.
-
         This function downloads and installs minikube as a local kubernetes
         cluster. Minikube is installed using the macOS package manager Homebrew.
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
 
         # try to install minikube
@@ -308,22 +288,18 @@ class minipy:
 
         """
         Main method to install Minikube with all dependencies.
-
         This function calls the previous private functions one after another to
         download and install all necessary components to setup Minikube.
-
         """
 
         # print message
         info_message = """
-
                                 ___________________________________________
            / \\__               | I am KubiDog, your Best Friend!           |
           (    @\\____          | I will guide you through the installation!|
           /          O          ------------------------------------------- 
          /   (______/       
         /_____/   U
-
         """
 
         # print info message
@@ -334,7 +310,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                                    ___________________________________________
                                   | Docker is already installed               |
                                    -------------------------------------------
@@ -349,7 +324,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                   ____________________________________________________________
                  | For just a couple of seconds you will leave Python. Docker |
                  | comes with a handy UI. You will need Docker to build and   |
@@ -370,11 +344,9 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | Successfully installed Docker             |
                                    -------------------------------------------
-
                   ____________________________________________________________
                  | To use Docker you need to create a user account. You can   | 
                  | do this on Dockerhub: https://hub.docker.com/. If you have |
@@ -399,7 +371,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                                    ___________________________________________
                                   | VirtualBox is already installed           |
                                    -------------------------------------------
@@ -414,7 +385,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                   ____________________________________________________________
                  | VirtualBox will be installed now. I am downloading the     |
                  | binary from: https://www.virtualbox.org/wiki/Downloads.    |
@@ -427,12 +397,10 @@ class minipy:
 
              # build info message
             info_message = """
-
                   ____________________________________________________________
                  | ATTENTION: you might be asked to provide your sudo pass in |
                  | just a second.                                             |
                   ------------------------------------------------------------
-
             """
             
             # print info about graphical interface
@@ -446,7 +414,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | Successfully installed VirtualBox         |
                                    -------------------------------------------
@@ -467,7 +434,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                                    ___________________________________________
                                   | Kubectl is already installed              |
                                    -------------------------------------------
@@ -482,7 +448,6 @@ class minipy:
 
              # build info message
             info_message = """
-
                   ____________________________________________________________
                  | I will download kubectl as your kubernetes cli. If you     |
                  | want to learn more about kubectl, you can visit:           |                 
@@ -502,7 +467,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | Successfully installed Kubectl            |
                                    -------------------------------------------
@@ -523,7 +487,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                                    ___________________________________________
                                   | Minikube already installed                |
                                    -------------------------------------------
@@ -538,7 +501,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                   ____________________________________________________________
                  | I will install Minikube now using brew. If you want to     |
                  | learn more about Minikube, you can visit:                  |
@@ -558,7 +520,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | Successfully installed Minikube           |
                                    -------------------------------------------
@@ -582,22 +543,18 @@ class minipy:
 
         """
         Main method to start the Minikube cluster.
-
         This function is a python wrapper around the 'minikube start' shell 
         command. The cluster is sporned and set to run.
-
         Parameters
         ----------
         cpus : str
             String to indicate the number of cores used for the cluster
         memory: str
             String to indicate the amount of memory allocated to the cluster
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
 
         # try to start minikube
@@ -635,10 +592,8 @@ class minipy:
 
         """
         Main method to check the status of the cluster.
-
         This function calls the standard minikube status check. Unlike the 
         self.current_status, this function shows the system output.
-
         """
 
         # try to call status
@@ -659,10 +614,8 @@ class minipy:
 
         """
         Private method to build a Dockerfile.
-
         This function first builds a Docker file from a python script and 
         a requirements.txt.
-
         Parameters
         ----------
         script_file : string
@@ -671,7 +624,6 @@ class minipy:
             String with the path to the requirements file
         port : string
             String with the port number to expose
-
         """
 
         # try to write Dockerfile
@@ -691,16 +643,11 @@ class minipy:
             # write content
             content = """\
             FROM python:{version}
-
             RUN mkdir -p /api
-
             COPY {script_file} /api/api.py
             COPY {requirements_file} /api/requirements.txt
-
             RUN python -m pip install -r /api/requirements.txt
-
             EXPOSE {port}
-
             ENTRYPOINT ["python", "api/api.py"]\
             """.format(version=self.py_version,
                     script_file = script_file,
@@ -733,9 +680,7 @@ class minipy:
 
         """
         Private method to build a Docker image from a Dockefile.
-
         This function builds a Docker image from a Dockerfile.
-
         """
 
         # try to build a Docker image
@@ -762,15 +707,12 @@ class minipy:
 
         """
         Private method to create a deployment.
-
         This function creates a deployment on Minikube based on the previously
         built Docker image.
-
         Parameters
         ----------
         deployment_name : string
             String with the name of the deployment
-
         """
 
         # try to create a new deployment
@@ -794,10 +736,8 @@ class minipy:
 
         """
         Private method to expose a deployment.
-
         This function exposes the deployment in Minikube to make it accessible
         from outside the Minikube cluster.
-
         Parameters
         ----------
         port : string
@@ -827,10 +767,8 @@ class minipy:
 
         """
         Private method to get the url of a deployment.
-
         This function exposes the service on a minikube level an retreives
         the url.
-
         Parameters
         ----------
         deployment_name : string
@@ -867,14 +805,11 @@ class minipy:
 
         """
         Private method to check if service exists.
-
         This function checks, if a service already exists on Minikube.
-
         Parameters
         ----------
         deployment_name : string
             String with the name of the deployment
-
         """
 
         # try to check if service exists
@@ -907,14 +842,11 @@ class minipy:
 
         """
         Private method to check if deployment exists.
-
         This function checks, if a deployment already exists on Minikube.
-
         Parameters
         ----------
         deployment_name : string
             String with the name of the deployment
-
         """
 
         # try to check if service exists
@@ -948,11 +880,9 @@ class minipy:
 
         """
         Main method to deploy APIs to minikube.
-
         This function first builds a Docker image from a python script and 
         a requirements.txt. This image is then deployed on the minikube
         cluster.
-
         Parameters
         ----------
         script_file : string
@@ -961,7 +891,6 @@ class minipy:
             String with the path to the requirements file
         port : string
             String with the port number to expose
-
         """
 
         # check if deployment name was given
@@ -978,7 +907,6 @@ class minipy:
 
         # build info message
         info_message = """
-
                   ____________________________________________________________
                  | To deploy your image, you will need to be logged in to     |
                  | Docker. So please, login if you have an account, or sign   |
@@ -1002,9 +930,7 @@ class minipy:
 
                 # print out first line
                 info_message = """\
-
                     This is the first line of the file you want to deploy:
-
                     -------------------------
                     {first_line}
                     -------------------------\
@@ -1024,10 +950,8 @@ class minipy:
 
             # raise Exception
             raise Exception("""
-
             script_file should be a path and filename to your python api
             script, that you want to deploy.
-
             e.g. /your_folder/your_script.py
             
             """)
@@ -1044,9 +968,7 @@ class minipy:
 
                 # print out first line
                 info_message = """\
-
                     This is the first line of your requirements file:
-
                     -------------------------
                     {first_line}
                     -------------------------\
@@ -1066,10 +988,8 @@ class minipy:
 
             # raise Exception
             raise Exception("""
-
             script_file should be a path and filename to your python api
             script, that you want to deploy.
-
             e.g. /your_folder/your_requirements.txt
             
             """)
@@ -1079,7 +999,6 @@ class minipy:
 
             # build info message
             info_message = """
-
                                    ___________________________________________
                                   | API will be deployed on {port}            |
                                    -------------------------------------------
@@ -1108,7 +1027,6 @@ class minipy:
                                    ___________________________________________
                                   | Successfully built Dockerfile             |
                                    -------------------------------------------
-
             """
 
             # print info message
@@ -1131,7 +1049,6 @@ class minipy:
                                    ___________________________________________
                                   | Successfully built Docker image           |
                                    -------------------------------------------
-
             """
 
             # print info message
@@ -1163,7 +1080,6 @@ class minipy:
                                    ___________________________________________
                                   | Successfully created deployment           |
                                    -------------------------------------------
-
             """
 
             # print info message
@@ -1195,7 +1111,6 @@ class minipy:
                                    ___________________________________________
                                   | Successfully expose                       |
                                    -------------------------------------------
-
             """
 
             # print info message
@@ -1215,12 +1130,10 @@ class minipy:
 
             # info message
             info_message = """
-
                     ____________________________________________________________
                     | Your deployment is ready and you can access the API via:   |
                     | {url}                                                      |
                     ------------------------------------------------------------
-
             """.format(url = self.service_url)
 
             # print message
@@ -1237,9 +1150,7 @@ class minipy:
 
         """
         Main method to get deployments on Minikube
-
         This function calls the standard kubectl get deployments command.
-
         """
 
         # try to get deployments
@@ -1260,9 +1171,7 @@ class minipy:
 
         """
         Main method to get services on Minikube
-
         This function calls the standard kubectl get services command.
-
         """
 
         # try to get services
@@ -1284,9 +1193,7 @@ class minipy:
 
         """
         Main method to get pods on Minikube
-
         This function calls the standard kubectl get pods command.
-
         """
 
         # try to get services
@@ -1308,9 +1215,7 @@ class minipy:
 
         """
         Main method to delete pods, deployments and services on Minikube
-
         This function calls the standard kubectl delete command.
-
         """
 
         # check if pod is specified
@@ -1366,11 +1271,9 @@ class minipy:
 
         """
         Main method to run the Minikube dashboard.
-
         This function calls the standard Minikube dashboard. Once called, the 
         dashboard is opened in the browser. The python console is then a trace
         log.
-
         """
 
         # try to start minikube dashboard
@@ -1391,15 +1294,12 @@ class minipy:
 
         """
         Main method to stop the Minikube cluster.
-
         This function stops and shuts down the Minikube cluster. The function
         is a wrapper around the 'minikube stop' shell command.
-
         Returns
         -------
         boolean
             Returns 'True' if successfully installed, otherwise 'False'
-
         """
         
         # try to stop minikube
@@ -1426,10 +1326,8 @@ class minipy:
 
         """
         Main method to delete Minikube and all dependencies.
-
         This function deletes Minikube together with all dependencies. The user
         has to decide which components to keep and which ones to delete.
-
         Parameters
         ----------
         cli : boolean
@@ -1525,7 +1423,6 @@ class minipy:
 
                     # build info message
                     info_message = """
-
                                    ___________________________________________
                                   | Successfully removed Docker               |
                                    -------------------------------------------
@@ -1546,7 +1443,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | Docker kept alive on your machine         |
                                    -------------------------------------------
@@ -1582,7 +1478,6 @@ class minipy:
 
                     # build info message
                     info_message = """
-
                                    ___________________________________________
                                   | Successfully removed kubectl              |
                                    -------------------------------------------
@@ -1603,7 +1498,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | kubectl kept alive on your machine        |
                                    -------------------------------------------
@@ -1625,7 +1519,6 @@ class minipy:
 
                     # build info message
                     info_message = """
-
                                    ___________________________________________
                                   | Successfully removed VirtualBox           |
                                    -------------------------------------------
@@ -1640,7 +1533,6 @@ class minipy:
 
                     # build info message
                     info_message = """
-
                                    ___________________________________________
                                   | VirtualBox could not be removed           |
                                    -------------------------------------------
@@ -1655,7 +1547,6 @@ class minipy:
 
                 # build info message
                 info_message = """
-
                                    ___________________________________________
                                   | VirtualBox kept alive on your machine     |
                                    -------------------------------------------
